@@ -8,30 +8,37 @@ class RefundRecord:
     result: int
 
 
-class refundSimulator:
+class RefundSimulator:
     def __init__(self):
         self.refund_amount = 0
         self.processed_request: dict[str, RefundRecord] = {}
 
     def refund(self, incoming_amount: int, request_id: str) -> int:
-        # 1. Check whether this request was already processed.
+        if type(incoming_amount) is not int:
+            raise TypeError("Refund amount must be an integer")
+
+        if incoming_amount <= 0:
+            raise ValueError("Refund amount must be positive")
+
+        if not isinstance(request_id, str):
+            raise TypeError("Request ID must be a string")
+
+        if not request_id.strip():
+            raise ValueError("Request ID must not be empty")
+
         if request_id in self.processed_request:
             record = self.processed_request[request_id]
 
-            # 2. Reject reuse of the same ID with a different amount.
             if record.amount != incoming_amount:
                 raise ValueError(
                     "Request ID reused with a different amount"
                 )
 
-            # 3. Return the original result, not the current total.
             return record.result
 
-        # 4. Process a new request.
         self.refund_amount += incoming_amount
         result = self.refund_amount
 
-        # 5. Save both the original amount and original result.
         self.processed_request[request_id] = RefundRecord(
             amount=incoming_amount,
             result=result,
@@ -40,12 +47,10 @@ class refundSimulator:
         return result
 
 
-
 if __name__ == "__main__":
-      r1=refundSimulator()
-      r2=refundSimulator()
-      print(r1.refund(500,"refund-001"))
-      print(r1.refund(500, "refund-001"))
-      print(r2.refund(200,"refund-002"))
-   
-    
+    r1 = RefundSimulator()
+    r2 = RefundSimulator()
+
+    print(r1.refund(500, "refund-001"))
+    print(r1.refund(500, "refund-001"))
+    print(r2.refund(200, "refund-002"))

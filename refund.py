@@ -9,6 +9,7 @@ def refund(incoming_amount):
       # TODO 3: Return the updated total
       return refunded_amount
 
-refund(500)
-refund(200)
-print(refunded_amount)
+if __name__=="__main__":
+      refund(500)
+      refund(200)
+      print(refunded_amount)

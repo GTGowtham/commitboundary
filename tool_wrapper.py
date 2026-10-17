@@ -1,12 +1,10 @@
-import faults
-import simulator
-from simulator import refundSimulator
-from faults import timeoutAfterCommit
+from simulator import RefundSimulator
+from faults import TimeoutAfterCommit
 
 class RefundTool:
       def __init__(self):
-            self.simulator=refundSimulator()
-            self.faults=timeoutAfterCommit()
+            self.simulator=RefundSimulator()
+            self.faults=TimeoutAfterCommit()
       
       
       def refund(self, amount, request_id):

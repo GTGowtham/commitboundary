@@ -24,3 +24,20 @@ def test_multiple_refund(clean_refund_state):
     assert result2==700
 
 
+def test_import_does_not_execute_refund_demo():
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import refund; print(refund.refunded_amount)",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert result.stdout.strip() == "0"
+
