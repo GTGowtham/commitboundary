@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 
 from tool_wrapper import RefundTool
-
+from reporting import build_report, write_report
 
 @dataclass(frozen=True)
 class ScenarioStep:
@@ -93,9 +93,7 @@ def run_scenario(steps: list[ScenarioStep]) -> ScenarioResult:
         final_history_entries=len(
             tool.simulator.processed_request
         ),
-    )
-
-
+)
 if __name__ == "__main__":
     scenario = [
         ScenarioStep(
@@ -112,8 +110,11 @@ if __name__ == "__main__":
 
     result = run_scenario(scenario)
 
-    for observation in result.trace:
-        print(observation)
+    report = build_report(result, "timeout_then_retry")
+    write_report(report, "reports/scenario_report.json")
 
+    print("Scenario:", report["scenario_name"])
+    print("Status:", report["status"])
     print("Final total:", result.final_total)
     print("Final history entries:", result.final_history_entries)
+    print("Report saved to: reports/scenario_report.json")
