@@ -32,3 +32,25 @@ def test_wrapper_rejects_conflicting_retry():
     # Neither the total nor the request history should change.
     assert tool.simulator.refund_amount == 500
     assert len(tool.simulator.processed_request) == 1
+
+def test_invalid_request_does_not_consume_timeout_fault():
+    tool = RefundTool()
+
+    # An invalid request must fail before any refund is committed.
+    with pytest.raises(ValueError):
+        tool.refund(0, "refund-001")
+
+    assert tool.simulator.refund_amount == 0
+    assert tool.simulator.processed_request == {}
+
+    # The first valid request should still trigger the timeout.
+    with pytest.raises(TimeoutError):
+        tool.refund(500, "refund-001")
+
+    # The refund committed even though the response was lost.
+    assert tool.simulator.refund_amount == 500
+
+    # Retrying must return the original result without duplication.
+    assert tool.refund(500, "refund-001") == 500
+    assert tool.simulator.refund_amount == 500
+    assert len(tool.simulator.processed_request) == 1
