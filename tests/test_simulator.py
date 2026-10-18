@@ -86,3 +86,22 @@ def test_reject_invalid_request_id_type(request_id):
 
     assert simulator.refund_amount == 0
     assert simulator.processed_request == {}
+
+
+def test_total_matches_processed_request_history():
+    simulator = RefundSimulator()
+
+    simulator.refund(100, "request-A")
+    simulator.refund(250, "request-B")
+    simulator.refund(100, "request-A")  # Duplicate retry
+    simulator.refund(50, "request-C")
+
+    recorded_total = sum(
+        record.amount
+        for record in simulator.processed_request.values()
+    )
+
+    assert simulator.refund_amount == 400
+    assert recorded_total == 400
+    assert simulator.refund_amount == recorded_total
+    assert len(simulator.processed_request) == 3
