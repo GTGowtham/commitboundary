@@ -5,7 +5,10 @@ def test_timeout_after_commit_then_retry():
       tool=RefundTool()
       
        # First call commits the refund but loses the response.
-      with pytest.raises(TimeoutError):
+      with pytest.raises(
+            TimeoutError,
+            match="Response lost after refund committed",
+            ):
             tool.refund(500,"refund-001")
       
       # The action committed despite the timeout.
